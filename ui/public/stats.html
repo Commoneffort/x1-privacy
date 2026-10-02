@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="X1 Privacy statistics — total wrapped, unwrapped and currently wrapped XNT and USDC.x, and the number of confidential transfers.">
+<title>X1 Privacy — Statistics</title>
+<style>
+:root{
+  --bg:#070b12;--bg-soft:#0b111b;--panel:#0f1724;--panel-2:#121c2c;--line:#1e2b40;--line-strong:#2b3d5a;
+  --text:#e6edf7;--muted:#8a9bb4;--faint:#5d6e88;
+  --brand:#38bdf8;
+  /* chart series: one colour per kind of activity, checked for colour-blind separation on --panel */
+  --s-wrap:#199e70;--s-unwrap:#d95926;--s-transfer:#9085e9;--s-supply:#3987e5;
+  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --radius:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{color-scheme:dark}
+body{font-family:var(--sans);background:
+  radial-gradient(900px 520px at 12% -8%,rgba(56,189,248,.10),transparent 60%),
+  radial-gradient(800px 520px at 100% 0%,rgba(99,102,241,.09),transparent 55%),var(--bg);
+  color:var(--text);min-height:100vh;line-height:1.45;-webkit-font-smoothing:antialiased}
+a{color:var(--brand);text-decoration:none}a:hover{text-decoration:underline}
+.shell{max-width:1160px;margin:0 auto;padding:22px 24px 64px}
+
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-bottom:20px;border-bottom:1px solid var(--line);margin-bottom:22px}
+.logo{display:flex;align-items:center;gap:12px;color:var(--text)}
+.logo:hover{text-decoration:none}
+.logo .mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#38bdf8,#6366f1);display:grid;place-items:center;font-weight:800;font-size:15px;color:#04121f;letter-spacing:-.02em}
+.logo h1{font-size:18px;font-weight:700;letter-spacing:-.01em}
+.logo p{font-size:12px;color:var(--muted)}
+.badge{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:999px;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;vertical-align:middle;border:1px solid var(--line-strong);color:var(--muted)}
+.badge.mainnet{color:#86efac;border-color:rgba(34,197,94,.5);background:rgba(34,197,94,.10)}
+.badge.testnet{color:#fcd34d;border-color:rgba(245,158,11,.5);background:rgba(245,158,11,.10)}
+.nav{display:flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+.nav a{padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--muted)}
+.nav a:hover{color:var(--text);text-decoration:none}
+.nav a.on{background:var(--panel-2);color:var(--text);box-shadow:inset 0 0 0 1px var(--line-strong)}
+
+/* ---- filters: one row above everything they control */
+.filters{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.seg{display:inline-flex;padding:3px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.seg button{appearance:none;border:0;background:transparent;color:var(--muted);font:600 12.5px var(--sans);padding:7px 13px;border-radius:7px;cursor:pointer}
+.seg button:hover{color:var(--text)}
+.seg button[aria-pressed="true"]{background:var(--panel-2);color:var(--text);box-shadow:inset 0 0 0 1px var(--line-strong)}
+.seg button:focus-visible,.nav a:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
+.filter{display:flex;align-items:center;gap:8px}
+.filters .lbl{font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.updated{margin-left:auto;font-size:12px;color:var(--faint)}
+.updated.stale{color:#fcd34d}
+
+/* ---- headline numbers */
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;border-top:3px solid var(--line-strong);min-width:0}
+.tile.supply{border-top-color:var(--s-supply)}.tile.wrap{border-top-color:var(--s-wrap)}
+.tile.unwrap{border-top-color:var(--s-unwrap)}.tile.transfer{border-top-color:var(--s-transfer)}
+.label{font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.num{font:600 26px var(--mono);letter-spacing:-.02em;word-break:break-word;line-height:1.15}
+.num small{font:500 13px var(--sans);color:var(--muted);letter-spacing:0;margin-left:6px}
+.sub{font-size:12px;color:var(--muted);margin-top:7px}
+.minis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:18px}
+.mini{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 16px;min-width:0}
+.mini .num{font-size:19px}
+.mini .label{margin-bottom:5px}
+
+/* ---- charts */
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px 14px;min-width:0}
+.card.wide{grid-column:1 / -1}
+.card h2{font-size:14px;font-weight:700}
+.card .desc{font-size:12px;color:var(--muted);margin-top:2px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:10px;height:10px;border-radius:3px;display:inline-block;flex:none}
+.sw.wrap{background:var(--s-wrap)}.sw.unwrap{background:var(--s-unwrap)}.sw.transfer{background:var(--s-transfer)}.sw.supply{background:var(--s-supply)}
+.plot{position:relative;margin-top:10px}
+.plot svg{display:block;width:100%;overflow:visible}
+.grid{stroke:var(--line);stroke-width:1}
+.axis{stroke:var(--line-strong);stroke-width:1}
+.tick{fill:var(--muted);font:11px var(--sans)}
+.f-wrap{fill:var(--s-wrap)}.f-unwrap{fill:var(--s-unwrap)}.f-transfer{fill:var(--s-transfer)}
+.l-supply{fill:none;stroke:var(--s-supply);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.a-supply{fill:var(--s-supply);opacity:.13}
+.pt{fill:var(--s-supply);stroke:var(--panel);stroke-width:2}
+.cross{stroke:var(--line-strong);stroke-width:1}
+.band{fill:transparent}.band.on{fill:rgba(255,255,255,.045)}
+.none{fill:var(--faint);font:12.5px var(--sans)}
+.tip{position:absolute;top:4px;pointer-events:none;background:#0b1220;border:1px solid var(--line-strong);border-radius:10px;padding:9px 11px;font-size:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,.5);opacity:0;transition:opacity .08s;white-space:nowrap;z-index:5}
+.tip.on{opacity:1}
+.tip b{display:block;font-weight:600;margin-bottom:5px;color:var(--text)}
+.tip div{display:flex;align-items:center;gap:7px;color:var(--muted);margin-top:2px}
+.tip div i{font:500 12px var(--mono);color:var(--text);margin-left:auto;padding-left:14px;font-style:normal}
+
+/* ---- tables */
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);text-align:right;padding:8px 10px;border-bottom:1px solid var(--line-strong);white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+th:first-child,td:first-child{text-align:left}
+td:first-child{font-family:var(--sans);font-weight:600}
+tr:last-child td{border-bottom:0}
+.scroll{overflow-x:auto}
+details{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+summary{cursor:pointer;font-size:12.5px;color:var(--muted);font-weight:600}
+details .scroll{margin-top:10px;max-height:340px;overflow-y:auto}
+.privacy{border:1px solid rgba(144,133,233,.35);background:rgba(144,133,233,.07);color:var(--text);border-radius:12px;padding:12px 16px;font-size:12.5px;margin-bottom:18px}
+.privacy b{color:#c4bdf7}
+.msg{padding:40px 0;text-align:center;color:var(--muted);font-size:13.5px}
+footer{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;color:var(--faint);font-size:12px;padding-top:18px;border-top:1px solid var(--line)}
+footer code{font:11.5px var(--mono);color:var(--muted)}
+
+@media(max-width:960px){.tiles{grid-template-columns:1fr 1fr}.minis{grid-template-columns:1fr 1fr}.charts{grid-template-columns:1fr}.updated{margin-left:0;width:100%}}
+@media(max-width:520px){.tiles,.minis{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="top">
+    <a class="logo" href="./">
+      <div class="mark">X1</div>
+      <div>
+        <h1>X1 Privacy <span class="badge" id="netBadge">…</span></h1>
+        <p>Protocol statistics</p>
+      </div>
+    </a>
+    <nav class="nav" aria-label="Pages">
+      <a href="./">App</a>
+      <a class="on" href="./stats.html" aria-current="page">Stats</a>
+    </nav>
+  </div>
+
+  <div class="filters">
+    <div class="filter"><span class="lbl">Token</span>
+    <div class="seg" id="tokenSeg" role="group" aria-label="Token"></div></div>
+    <div class="filter"><span class="lbl">Period</span>
+    <div class="seg" id="rangeSeg" role="group" aria-label="Period">
+      <button data-range="24h">24 hours</button>
+      <button data-range="7d">7 days</button>
+      <button data-range="30d">30 days</button>
+      <button data-range="all">All time</button>
+    </div></div>
+    <span class="updated" id="updated">Loading…</span>
+  </div>
+
+  <div id="content">
+    <div class="msg" id="msg">Loading statistics…</div>
+  </div>
+
+  <template id="tpl">
+    <section class="tiles">
+      <div class="tile supply"><div class="label">Currently wrapped</div><div class="num" id="kSupply">—</div><div class="sub" id="kBacking">—</div></div>
+      <div class="tile wrap"><div class="label">Total wrapped</div><div class="num" id="kWrapped">—</div><div class="sub" id="kWraps">—</div></div>
+      <div class="tile unwrap"><div class="label">Total unwrapped</div><div class="num" id="kUnwrapped">—</div><div class="sub" id="kUnwraps">—</div></div>
+      <div class="tile transfer"><div class="label">Confidential transfers</div><div class="num" id="kTransfers">—</div><div class="sub">amounts are encrypted</div></div>
+    </section>
+    <section class="minis">
+      <div class="mini"><div class="label">Wraps</div><div class="num" id="mWraps">—</div></div>
+      <div class="mini"><div class="label">Unwraps</div><div class="num" id="mUnwraps">—</div></div>
+      <div class="mini"><div class="label">Confidential accounts</div><div class="num" id="mAccounts">—</div></div>
+      <div class="mini"><div class="label">Wallets</div><div class="num" id="mWallets">—</div></div>
+      <div class="mini"><div class="label">Wrap fees paid</div><div class="num" id="mFees">—</div></div>
+    </section>
+
+    <section class="charts">
+      <div class="card">
+        <h2>Wrapped and unwrapped</h2>
+        <div class="desc" id="volDesc">—</div>
+        <div class="legend"><span><i class="sw wrap"></i>Wrapped</span><span><i class="sw unwrap"></i>Unwrapped</span></div>
+        <div class="plot" id="volPlot"></div>
+      </div>
+      <div class="card">
+        <h2>Currently wrapped</h2>
+        <div class="desc" id="supDesc">—</div>
+        <div class="legend"><span><i class="sw supply"></i>Supply, equal to the reserve</span></div>
+        <div class="plot" id="supPlot"></div>
+      </div>
+      <div class="card wide">
+        <h2>Activity</h2>
+        <div class="desc" id="actDesc">—</div>
+        <div class="legend"><span><i class="sw wrap"></i>Wraps</span><span><i class="sw unwrap"></i>Unwraps</span><span><i class="sw transfer"></i>Confidential transfers</span></div>
+        <div class="plot" id="actPlot"></div>
+        <details>
+          <summary>Show this period as a table</summary>
+          <div class="scroll"><table id="periodTable"></table></div>
+        </details>
+      </div>
+    </section>
+
+    <div class="privacy">
+      <b>What these numbers can and cannot show.</b> Wrap and unwrap amounts are public by design, so they are counted here exactly.
+      Confidential transfers are counted, but their amounts are encrypted on-chain and nobody — including this page — can read them. Individual balances are never shown.
+    </div>
+
+    <section class="card" style="margin-bottom:18px">
+      <h2>All tokens</h2>
+      <div class="desc">Totals since launch</div>
+      <div class="scroll" style="margin-top:10px"><table id="tokenTable"></table></div>
+    </section>
+  </template>
+
+  <footer>
+    <span><a href="./">Open the app</a> · <a href="./whitepaper.pdf" target="_blank" rel="noopener">Whitepaper (PDF)</a> · Program <code id="programAddr">—</code></span>
+    <span>Read from public chain history. Times are UTC.</span>
+  </footer>
+</div>
+<script type="module" src="./stats.js?v=1"></script>
+</body>
+</html>

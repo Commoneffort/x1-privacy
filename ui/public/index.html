@@ -38,6 +38,10 @@ a{color:var(--brand);text-decoration:none}a:hover{text-decoration:underline}
 .badge{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:999px;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;vertical-align:middle;border:1px solid var(--line-strong);color:var(--muted)}
 .badge.mainnet{color:#86efac;border-color:rgba(34,197,94,.5);background:rgba(34,197,94,.10)}
 .badge.testnet{color:#fcd34d;border-color:rgba(245,158,11,.5);background:rgba(245,158,11,.10)}
+.nav{display:flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+.nav a{padding:5px 12px;border-radius:8px;font-size:13px;font-weight:600;color:var(--muted)}
+.nav a:hover{color:var(--text);text-decoration:none}
+.nav a.on{background:var(--panel-2);color:var(--text);box-shadow:inset 0 0 0 1px var(--line-strong)}
 .top-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .select{display:flex;align-items:center;gap:8px;padding:7px 10px 7px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);font-size:12.5px;color:var(--muted)}
 .select select{background:transparent;border:0;color:var(--text);font:600 13px var(--sans);outline:none;cursor:pointer}
@@ -138,6 +142,7 @@ footer code{font:11.5px var(--mono);color:var(--muted)}
       </div>
     </div>
     <div class="top-right">
+      <nav class="nav" aria-label="Pages"><a class="on" href="./" aria-current="page">App</a><a href="./stats.html">Stats</a></nav>
       <label class="select">Token
         <select id="tokenSelect"><option value="cXNT">cXNT (XNT)</option></select>
       </label>
@@ -251,11 +256,11 @@ footer code{font:11.5px var(--mono);color:var(--muted)}
   </div>
 
   <footer>
-    <span><a href="./whitepaper.pdf" target="_blank" rel="noopener">Whitepaper (PDF)</a> · <a href="./integration.md" target="_blank" rel="noopener">Integration guide</a> · Program <code id="programAddr">—</code></span>
+    <span><a href="./whitepaper.pdf" target="_blank" rel="noopener">Whitepaper (PDF)</a> · <a href="./integration.md" target="_blank" rel="noopener">Integration guide</a> · <a href="./stats.html">Statistics</a> · Program <code id="programAddr">—</code></span>
     <span>More tokens and confidential swaps are on the roadmap.</span>
   </footer>
 </div>
 <div id="toast"></div>
-<script type="module" src="./app.bundle.js?v=batch-202610022019"></script>
+<script type="module" src="./app.bundle.js?v=batch-202610022136"></script>
 </body>
 </html>

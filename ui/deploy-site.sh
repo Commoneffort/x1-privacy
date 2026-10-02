@@ -17,10 +17,12 @@ assert j.get("faucet") is False, "a mainnet build must not enable a faucet"
 blob = json.dumps(j)
 assert "ecret" not in blob and "_kp" not in blob, "state contains key material"
 PY
-FILES="index.html app.bundle.js proofgen51.wasm state.json whitepaper.pdf integration.md idl.json"
+FILES="index.html app.bundle.js proofgen51.wasm state.json whitepaper.pdf integration.md idl.json stats.html stats.js"
+# written into the web root by the statistics indexer (ui/indexer/index-stats.mjs), not by this script
+KEEP="stats.json"
 mkdir -p "$DEST"
 # publish exactly these files; anything else in the web root is removed
-find "$DEST" -mindepth 1 -maxdepth 1 $(printf -- "! -name %s " $FILES) -exec rm -rf {} +
+find "$DEST" -mindepth 1 -maxdepth 1 $(printf -- "! -name %s " $FILES $KEEP) -exec rm -rf {} +
 for f in $FILES; do cp "$SRC/$f" "$DEST/$f.new" && mv -f "$DEST/$f.new" "$DEST/$f"; done
 chmod -R a+rX "$DEST"
 echo "published to $DEST:"; ls -la "$DEST"

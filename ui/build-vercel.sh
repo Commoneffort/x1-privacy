@@ -17,7 +17,7 @@ STATE_URL=${STATE_URL:-http://127.0.0.1:8910/api/state}
 mkdir -p "$OUT"
 rm -rf "$OUT/api" "$OUT/package.json"
 cp public/index.html public/app.bundle.js public/proofgen51.wasm "$OUT"/
-for f in whitepaper.pdf integration.md idl.json; do [ -f "public/$f" ] && cp "public/$f" "$OUT"/; done
+for f in whitepaper.pdf integration.md idl.json stats.html stats.js; do [ -f "public/$f" ] && cp "public/$f" "$OUT"/; done
 curl -fsS "$STATE_URL" > "$OUT/state.json"
 python3 - "$OUT" "$NETWORK" <<'PY'
 import json, sys

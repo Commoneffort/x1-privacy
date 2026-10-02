@@ -46,6 +46,9 @@
 !/ui/server.js
 !/ui/public/index.html
 !/ui/public/app.js
+!/ui/public/stats.html
+!/ui/public/stats.js
+!/ui/indexer/index-stats.mjs
 !/ui/public/proofgen51.wasm
 !/ui/public/whitepaper.pdf
 !/ui/vercel/package.json

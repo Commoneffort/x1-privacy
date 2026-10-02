@@ -81,7 +81,7 @@ const CUSTOM_ERR = {
 };
 const TOKEN_ERR = {
   0:"The token program rejected this token account (invalid account data). Recreate the account and retry.",
-  1:"The token account does not have enough funds for this operation.",
+  1:"Not enough funds for this operation. Check that the wallet has enough XNT for network fees and enough of the token.",
   2:"Invalid token mint.",
   4:"The owner of this token account does not match what was expected.",
   48:"This account is missing a required token-2022 extension. Create a fresh confidential account and retry.",

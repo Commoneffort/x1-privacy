@@ -2,7 +2,7 @@
 
 **Confidential balances and transfers for XNT and USDC.x on X1 — permissionless, self-custodial, fully backed.**
 
-[Website](https://x1privacy.vercel.app) · [Whitepaper (PDF)](ui/public/whitepaper.pdf) · [Integration guide](docs/INTEGRATION.md) · [Deployments](docs/DEPLOYMENTS.md) · [Security](SECURITY.md)
+[Website](https://x1privacy.xyz) · [Whitepaper (PDF)](ui/public/whitepaper.pdf) · [Integration guide](docs/INTEGRATION.md) · [Deployments](docs/DEPLOYMENTS.md) · [Security](SECURITY.md)
 
 > **Status:** live on X1 mainnet. New software, **not yet independently audited** —
 > see the [internal security review](docs/AUDIT-2026-10-02.md) and its open
@@ -114,6 +114,7 @@ cmp <(head -c "$(stat -c %s program/target/deploy/x1_confidential.so)" onchain.s
 | `program/tests/native_unwrap_smoke.ts` | Sends a small wrap → repair → unwrap round trip through a live deployment. |
 | `ui/e2e/live_e2e.py` | Drives the real page in a headless browser with an injected test wallet and counts wallet prompts. |
 | `program/scripts/launch_mainnet.sh` | Staged deployment (`check` sends nothing). |
+| `ui/deploy-site.sh` | Publishes the built static site to a web root (the site has no backend). |
 
 ## Fees
 

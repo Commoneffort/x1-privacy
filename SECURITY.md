@@ -19,7 +19,7 @@ you informed, and credit you unless you prefer otherwise.
 |---|---|
 | On-chain program | `program/programs/x1_confidential` — mainnet `X1PRVwe2PgSYyWZH2hBtUqAxnpPtp6s14jAgZCu4iF1` |
 | Proof module (wasm / CLI) | `proofgen/` |
-| Web client | `ui/` — https://x1privacy.vercel.app |
+| Web client | `ui/` — https://x1privacy.xyz |
 
 Out of scope: the chain's own Token-2022 and ZK ElGamal proof programs, wallet
 extensions, RPC providers.

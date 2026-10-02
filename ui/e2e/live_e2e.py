@@ -2,7 +2,7 @@ import base64, json, os, sys, time
 from playwright.sync_api import sync_playwright
 from solders.keypair import Keypair
 
-URL = os.environ.get("E2E_URL", "https://x1privacy.vercel.app/")
+URL = os.environ.get("E2E_URL", "https://x1privacy.xyz/")
 kp = Keypair.from_bytes(bytes(json.load(open(os.path.expanduser(os.environ["E2E_WALLET"])))))
 PUB = str(kp.pubkey())
 STEPS = sys.argv[1:] or ["connect", "create"]
@@ -48,7 +48,7 @@ INIT = """(function(){
 })();""" % (PUB, MODE, os.environ.get("E2E_SIGNALL","all"))
 
 with sync_playwright() as pw:
-    b = pw.chromium.launch(args=["--no-sandbox"])
+    b = pw.chromium.launch(args=["--no-sandbox"] + os.environ.get("E2E_CHROME_ARGS", "").split())
     p = b.new_page(viewport={"width": 1280, "height": 900})
     logs = []
     p.on("console", lambda m: logs.append(f"[{m.type}] {m.text}"))

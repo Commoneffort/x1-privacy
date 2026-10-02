@@ -27,7 +27,7 @@ Program binary: 414,992 bytes, sha256
 The program is upgradeable; the upgrade authority is a single key today (see the
 audit notes on governance).
 
-Website: https://x1privacy.vercel.app
+Website: https://x1privacy.xyz
 
 ## X1 testnet
 

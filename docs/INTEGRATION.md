@@ -4,7 +4,7 @@ This guide is everything a wallet or app needs to support X1 Privacy natively:
 show confidential balances, wrap, send, receive and unwrap. The protocol is
 permissionless — no key, registration or approval is needed to integrate.
 
-The reference implementation is the open web client at https://x1privacy.vercel.app
+The reference implementation is the open web client at https://x1privacy.xyz
 (`app.bundle.js`, with the proof module `proofgen51.wasm`). The program's IDL is
 served at `/idl.json`, and the live addresses at `/api/state`.
 

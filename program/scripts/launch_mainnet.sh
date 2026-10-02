@@ -9,7 +9,7 @@
 #   program   deploys the X1 Privacy program at the address of its program keypair
 #   mints     registers cXNT (native XNT) and cUSDC.x (real USDC.x), both uncapped
 #   smoke     wraps 0.01 XNT, repairs, unwraps 0.005 XNT through the live program
-#   site      builds the mainnet website bundle (no faucet) into ui/vercel-dist/x1privacy
+#   site      builds the mainnet website bundle (no faucet); publish it with ui/deploy-site.sh
 #
 # Required environment:
 #   DEPLOYER   path to the mainnet deployer keypair (upgrade authority + cap governance)
@@ -106,7 +106,7 @@ site)
   trap 'kill $SERVER 2>/dev/null' EXIT
   for i in $(seq 1 20); do curl -fsS http://127.0.0.1:8911/api/state >/dev/null 2>&1 && break; sleep 0.5; done
   NETWORK=mainnet OUT=x1privacy STATE_URL=http://127.0.0.1:8911/api/state ./build-vercel.sh
-  echo "now: cd ui/vercel-dist/x1privacy && VERCEL_TOKEN=... npx vercel deploy --prod --yes"
+  echo "now publish it: ui/deploy-site.sh"
   ;;
 *)
   sed -n '2,20p' "$0"; exit 1 ;;

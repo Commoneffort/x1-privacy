@@ -11,7 +11,7 @@ declare_id!("X1PRVwe2PgSYyWZH2hBtUqAxnpPtp6s14jAgZCu4iF1");
 #[cfg(not(feature = "no-entrypoint"))]
 solana_security_txt::security_txt! {
     name: "X1 Privacy",
-    project_url: "https://x1privacy.vercel.app",
+    project_url: "https://x1privacy.xyz",
     contacts: "link:https://github.com/Commoneffort/x1-privacy/security/advisories/new",
     policy: "https://github.com/Commoneffort/x1-privacy/blob/main/SECURITY.md",
     preferred_languages: "en",

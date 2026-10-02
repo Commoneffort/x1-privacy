@@ -42,6 +42,7 @@
 !/ui/package-lock.json
 !/ui/build.js
 !/ui/build-vercel.sh
+!/ui/deploy-site.sh
 !/ui/server.js
 !/ui/public/index.html
 !/ui/public/app.js

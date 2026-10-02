@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>X1 Privacy — Whitepaper</title>
+<style>
+@page{size:A4;margin:22mm 20mm 20mm 20mm}
+*{box-sizing:border-box}
+body{font-family:"Helvetica Neue",Helvetica,Arial,"Liberation Sans","DejaVu Sans",sans-serif;color:#162033;font-size:10.6pt;line-height:1.5;margin:0}
+h1{font-size:30pt;letter-spacing:-.02em;margin:0 0 6pt;color:#0b1220}
+h2{font-size:15pt;margin:22pt 0 7pt;color:#0b1220;border-bottom:1.5pt solid #dbe4f0;padding-bottom:4pt;page-break-after:avoid}
+h3{font-size:11.5pt;margin:13pt 0 4pt;color:#0b1220;page-break-after:avoid}
+p{margin:0 0 7pt}ul{margin:0 0 8pt 16pt;padding:0}li{margin-bottom:3.5pt}
+.cover{height:245mm;display:flex;flex-direction:column;justify-content:center;page-break-after:always}
+.mark{width:52pt;height:52pt;border-radius:13pt;background:linear-gradient(135deg,#38bdf8,#6366f1);color:#04121f;font-weight:800;font-size:20pt;display:flex;align-items:center;justify-content:center;margin-bottom:22pt}
+.cover .sub{font-size:14pt;color:#40506b;margin-bottom:26pt;max-width:130mm}
+.cover .meta{font-size:10pt;color:#5d6e88}
+.lead{font-size:11.6pt;color:#26344d}
+.box{border:1pt solid #cfdae8;background:#f5f8fc;border-radius:8pt;padding:10pt 12pt;margin:9pt 0;page-break-inside:avoid}
+.box.warn{border-color:#f1cf8a;background:#fff8e8}
+table{width:100%;border-collapse:collapse;margin:8pt 0 10pt;font-size:10pt;page-break-inside:avoid}
+th,td{text-align:left;vertical-align:top;padding:6pt 8pt;border-bottom:.75pt solid #dbe4f0}
+th{background:#eef3f9;font-weight:700;color:#0b1220}
+.flow{display:flex;align-items:stretch;gap:6pt;margin:10pt 0 12pt;page-break-inside:avoid}
+.step{flex:1;border-radius:8pt;padding:9pt 10pt;color:#fff;font-size:9.6pt}
+.step b{display:block;font-size:11pt;margin-bottom:3pt}
+.s1{background:#16a34a}.s2{background:#4f46e5}.s3{background:#d97706}
+.arrow{align-self:center;color:#8a9bb4;font-size:15pt}
+code{font-family:"DejaVu Sans Mono","Liberation Mono",Menlo,Consolas,monospace;font-size:9.4pt;background:#eef3f9;padding:0 3pt;border-radius:3pt}
+.small{font-size:9.2pt;color:#5d6e88}
+</style></head><body>
+
+<div class="cover">
+  <div class="mark">X1</div>
+  <h1>X1 Privacy</h1>
+  <div class="sub">Confidential balances and transfers for XNT and USDC.x on X1 — permissionless, self-custodial and fully backed.</div>
+  <div class="meta">Whitepaper · Version 1.0 · October 2026</div>
+</div>
+
+<h2>1. Summary</h2>
+<p class="lead">X1 Privacy lets anyone hold and send XNT and USDC.x on X1 without revealing how much. A user wraps a public token into its confidential counterpart, transfers it with the amount encrypted on-chain, and unwraps it back to the public token at any time, one for one.</p>
+<p>The protocol is a small on-chain program that holds a reserve and mints or burns confidential tokens against it. It builds on the confidential-transfer capability of the chain's Token-2022 program and the chain's native zero-knowledge proof verifier, rather than on new cryptography. There is no custodian, no allow-list and no off-chain operator in the path of a user's funds.</p>
+<div class="box">
+<b>In one paragraph.</b> Deposit a token into the reserve and receive the same amount of a confidential token. Balances and transfer amounts of that token are stored on-chain only as ciphertext, and every transfer carries zero-knowledge proofs that it is valid. Burn the confidential token to take the original back. The confidential supply always equals what the reserve holds.
+</div>
+
+<h2>2. The problem</h2>
+<p>On a public ledger every balance and every payment amount is visible to everyone, permanently. That is a poor fit for ordinary economic life:</p>
+<ul>
+<li><b>Salaries, invoices and treasury movements</b> become public the moment they are paid on-chain.</li>
+<li><b>Holders are profiled.</b> Anyone who learns one of your addresses learns your balance and can watch it change.</li>
+<li><b>Traders and businesses leak strategy.</b> Position sizes and counterparties' payment sizes are open to competitors.</li>
+<li><b>Recipients are exposed too.</b> Paying someone reveals to them, and to everyone else, how much you hold.</li>
+</ul>
+<p>Existing answers tend to ask for a trade-off users should not have to make: move to a different chain, trust a custodian or a privileged operator, or accept a new and unproven cryptographic system. X1 Privacy takes a narrower path: keep the assets on X1, keep users in control of their own keys, and hide the one thing that matters most in day-to-day use — the amounts.</p>
+
+<h2>3. What X1 Privacy provides</h2>
+<table>
+<tr><th style="width:34%">Property</th><th>What it means</th></tr>
+<tr><td><b>Confidential balances</b></td><td>The balance of a confidential account is stored encrypted. Only its owner can read it.</td></tr>
+<tr><td><b>Confidential transfer amounts</b></td><td>The amount moved between two confidential accounts is encrypted. Validators verify proofs, not numbers.</td></tr>
+<tr><td><b>Full backing</b></td><td>Confidential tokens are minted only against tokens deposited in the reserve, and burned on exit.</td></tr>
+<tr><td><b>Self-custody</b></td><td>Encryption keys are derived by the user's own wallet in the user's own browser. Nobody else holds them.</td></tr>
+<tr><td><b>Permissionless use</b></td><td>Anyone can wrap, send, receive and unwrap. There is no sign-up, allow-list or approval step.</td></tr>
+<tr><td><b>Free exit</b></td><td>Unwrapping costs no protocol fee and depends only on the reserve and the user's own accounts.</td></tr>
+</table>
+
+<h2>4. How it works</h2>
+<div class="flow">
+  <div class="step s1"><b>Wrap</b>Public tokens move from the wallet into the program's reserve. The same amount of the confidential token is minted to the user, less a one-time fee.</div>
+  <div class="arrow">→</div>
+  <div class="step s2"><b>Send privately</b>Confidential tokens move between confidential accounts. The amount is encrypted and accompanied by zero-knowledge proofs.</div>
+  <div class="arrow">→</div>
+  <div class="step s3"><b>Unwrap</b>Confidential tokens are burned and the same amount of the public token leaves the reserve to the user. No fee.</div>
+</div>
+
+<h3>4.1 Building blocks</h3>
+<p>X1 Privacy composes three things that already exist on X1:</p>
+<ul>
+<li><b>Token-2022 confidential balances.</b> The token program can hold a balance as a twisted-ElGamal ciphertext over Curve25519 and update it homomorphically: adding or subtracting an encrypted amount without ever decrypting anything.</li>
+<li><b>The chain's native zero-knowledge proof program.</b> It verifies the proofs that keep encrypted arithmetic honest: that the sender's remaining balance is consistent and non-negative, that the transferred amount is within range, and that the ciphertexts are well-formed.</li>
+<li><b>The X1 Privacy program.</b> It owns the reserve, is the only mint authority of each confidential token, and enforces that minting and burning always match real movements of the backing token.</li>
+</ul>
+
+<h3>4.2 Wrap</h3>
+<p>In a single transaction the user's public tokens are transferred into the reserve, the protocol fee is forwarded to the fee account, and the net amount of the confidential token is minted into the user's confidential account as an encrypted pending balance. For XNT, the native coin is wrapped and deposited in the same transaction, so the user simply spends XNT from their wallet. The program checks on-chain that the reserve actually received the deposit and that exactly the net amount was minted.</p>
+
+<h3>4.3 Confidential transfer</h3>
+<p>A transfer is a direct call to the token program; the X1 Privacy program is not involved and charges nothing. The sender's wallet builds three proofs locally:</p>
+<ul>
+<li>an <b>equality proof</b> that the sender's new encrypted balance matches a commitment to the correct remaining amount;</li>
+<li>a <b>validity proof</b> that the amount was encrypted correctly for both sender and recipient;</li>
+<li>a <b>range proof</b> that the amount and the remaining balance are non-negative and within bounds, so value cannot be created.</li>
+</ul>
+<p>The chain verifies the proofs and updates both encrypted balances. The sender pays the recipient's confidential account address. The funds arrive as an incoming balance, which the recipient's client folds into the spendable balance the next time they send or unwrap, under the same approval. Each transfer uses fresh randomness, so equal amounts never produce equal ciphertexts.</p>
+
+<h3>4.4 Unwrap</h3>
+<p>The user proves, in zero knowledge, that their encrypted balance covers the amount; the token program converts that amount to a public balance; the X1 Privacy program burns it and releases the same amount from the reserve to the user. The program verifies that the confidential supply really fell by the amount burned before any backing leaves the reserve. For XNT the user receives the native coin directly.</p>
+
+<h3>4.5 Keys</h3>
+<p>A confidential account has an encryption key pair that is separate from the wallet's signing key. X1 Privacy derives it deterministically from a signature made by the user's wallet over a fixed message bound to the owner and the token. The derivation happens in the user's browser, the key is held only in memory, and it can be re-derived from the same wallet at any time. No server ever receives a key, a signature used for derivation, or a balance.</p>
+
+<h3>4.6 Proof generation</h3>
+<p>All proofs are generated on the user's device by an open module that runs in the browser. The website is a static page: it reads the chain and submits transactions the user has signed. It cannot see balances and cannot move funds.</p>
+
+<h2>5. Backing</h2>
+<p>For every supported token the program keeps one reserve account and one confidential mint, and maintains a single invariant:</p>
+<div class="box"><b>reserve balance ≥ confidential supply, at all times.</b> In normal operation the two are equal.</div>
+<p>The invariant is enforced by the program itself, not by an operator:</p>
+<ul>
+<li>The confidential mint's only mint authority is an address controlled by the program. No wallet can mint.</li>
+<li>Minting happens only inside a deposit, after the reserve is verified to have received the tokens.</li>
+<li>Backing is released only inside a withdrawal, after the burn is verified against the mint's supply.</li>
+<li>The token programs used for these operations are derived from the mints on-chain and cannot be substituted by a caller.</li>
+<li>After every wrap and unwrap the program re-checks that the reserve covers the outstanding supply, and aborts otherwise.</li>
+<li>The confidential token uses the same number of decimals as the token it wraps, so one unit always means one unit.</li>
+</ul>
+<p>There is no artificial ceiling on supply: the confidential supply of a token is simply whatever users have wrapped, and falls to zero if everyone unwraps. The reserve, the supply and the mint are public and can be checked by anyone at any time.</p>
+
+<h2>6. Permissionless by design</h2>
+<p>X1 Privacy is built so that using it never requires anyone's permission, and so that no party can stand between a user and their funds.</p>
+<ul>
+<li><b>Open access.</b> Any wallet can create a confidential account, wrap, send, receive and unwrap. New accounts are approved automatically by the token itself.</li>
+<li><b>No custody.</b> Funds sit in a program-controlled reserve and in users' own token accounts. There is no operator wallet holding user funds.</li>
+<li><b>No freeze, no seizure.</b> Confidential tokens are created without a freeze authority, and the program has no instruction that moves, burns or blocks a user's balance.</li>
+<li><b>No pause switch.</b> The program has no instruction to halt wrapping, transfers or unwrapping.</li>
+<li><b>Unconditional exit.</b> Unwrapping carries no protocol fee and touches only the reserve and the user's own accounts.</li>
+<li><b>No privileged view.</b> No auditor or viewing key is configured. Nobody but the account owner can decrypt a balance or an amount.</li>
+<li><b>No dependency on our website.</b> Transfers are ordinary token-program transactions and every instruction is public. Anyone can build an alternative interface or integrate the protocol into a wallet.</li>
+</ul>
+<h3>What is not permissionless today</h3>
+<p>A few things are deliberately controlled at launch. Adding support for a new token is done by the program's upgrade authority, so that each reserve is set up correctly. That authority can also lower a token's supply ceiling, which can stop new wraps of that token but can never block transfers or unwrapping. And the program itself is upgradeable, so that defects found during the early period can be fixed. The upgrade authority cannot be used through any existing instruction to take funds, but an upgrade could change the program's rules; users rely on that authority acting honestly until its powers are reduced. Reducing them — through shared control and, ultimately, a fixed program — is part of the roadmap.</p>
+
+<h2>7. Privacy model</h2>
+<p>X1 Privacy provides <b>confidentiality of amounts</b>. It does not provide anonymity, and it is important to be precise about the difference.</p>
+<table>
+<tr><th style="width:50%">Hidden</th><th>Public</th></tr>
+<tr><td>The balance of every confidential account</td><td>That an address owns a confidential account</td></tr>
+<tr><td>The amount of every confidential transfer</td><td>Sender and recipient accounts of every transfer, and when it happened</td></tr>
+<tr><td>How a balance is split across incoming payments</td><td>The amount of every wrap and unwrap, and the wallet that made it</td></tr>
+<tr><td></td><td>Total supply and reserve of each confidential token</td></tr>
+</table>
+<p>Practical consequences:</p>
+<ul>
+<li>An observer can see that A paid B, but not how much, and cannot tell what either holds.</li>
+<li>Wrapping a distinctive amount and unwrapping the same amount soon after, from a related address, can be linked by amount and timing. Keeping funds wrapped and transacting in confidential form is what provides privacy.</li>
+<li>Like any website and any network endpoint, the interface host and the RPC provider can see the IP addresses that connect to them. The interface loads no third-party resources.</li>
+</ul>
+
+<h2>8. Fees</h2>
+<table>
+<tr><th style="width:34%">Action</th><th>Protocol fee</th></tr>
+<tr><td>Wrap</td><td>0.39% of the amount, charged once, in the token being wrapped</td></tr>
+<tr><td>Confidential transfer</td><td>None</td></tr>
+<tr><td>Unwrap</td><td>None</td></tr>
+</table>
+<p>The fee is taken on the way in so that the way out is never encumbered: a recipient who was paid in a confidential token can always redeem it in full. The fee destination is fixed in the program and cannot be redirected by a caller. Ordinary network transaction fees apply to every action and are paid to the network, not to the protocol.</p>
+
+<h2>9. Supported assets</h2>
+<table>
+<tr><th style="width:22%">Confidential token</th><th style="width:24%">Backed by</th><th>Notes</th></tr>
+<tr><td><b>cXNT</b></td><td>XNT, the native coin of X1</td><td>Wrapped and unwrapped directly from and to the wallet's native balance.</td></tr>
+<tr><td><b>cUSDC.x</b></td><td>USDC.x on X1</td><td>The bridged USDC.x token; supply follows what users wrap.</td></tr>
+</table>
+<p><b>More tokens will be added.</b> The program is generic: a token is supported by registering a confidential mint and a reserve for it, with the same rules and the same invariant. Each addition is announced with its on-chain addresses so that anyone can verify the backing.</p>
+
+<h2>10. Security</h2>
+<p>The program is intentionally small, holds a single kind of state per token, and relies on the chain's own token and proof programs for all cryptography. Its design rules are simple: never trust an account or a program supplied by the caller without deriving or checking it on-chain; verify the effect of every mint, burn and transfer against on-chain balances; and keep the exit path free of anything that is not strictly necessary.</p>
+<p>The code has been through internal review and adversarial testing, including end-to-end tests of every user flow against a live network and simulated attempts to bypass the burn, redirect payouts and misuse governance functions.</p>
+<div class="box warn"><b>Independent audits.</b> At the time of this version the protocol has not yet been audited by an independent firm. Independent security audits will be commissioned and added as the protocol grows, and their reports will be published in full. Until then, users should treat the software as new and size their exposure accordingly.</div>
+<h3>Risks users should understand</h3>
+<ul>
+<li><b>Smart-contract risk.</b> A defect in the program, or in the token and proof programs it depends on, could put the reserve at risk.</li>
+<li><b>Upgrade authority.</b> While the program is upgradeable, its rules can be changed by the holder of that authority (see section 6).</li>
+<li><b>Key handling.</b> A confidential account's key is derived from the user's wallet. Losing access to the wallet means losing the ability to decrypt and spend. A compromised device can expose keys and balances.</li>
+<li><b>Metadata.</b> Addresses, timing and wrap and unwrap amounts are public (see section 7).</li>
+</ul>
+
+<h2>11. Roadmap</h2>
+<ul>
+<li><b>More tokens.</b> Additional X1 assets, each with its own verifiable reserve.</li>
+<li><b>Confidential swaps.</b> Exchanging one confidential token for another without revealing amounts. This requires binding both sides of a trade under encryption and is being designed as a dedicated mechanism; it will not ship until it is safe.</li>
+<li><b>Independent security audits</b>, published as they complete, and a public disclosure channel for researchers.</li>
+<li><b>Reduced governance.</b> Moving the upgrade authority to shared control and progressively limiting what it can change.</li>
+<li><b>Wallet integration.</b> One-approval wraps, sends and unwraps with automatic receipt of incoming payments are available in the web client, and an open integration guide is published for wallets and apps. Native support inside wallets depends on each wallet team and is being pursued.</li>
+</ul>
+
+<h2>12. Notice</h2>
+<p class="small">This document describes software and is provided for information only. It is not an offer or solicitation, and nothing in it is financial, legal or tax advice. X1 Privacy is experimental software provided as is, without warranties of any kind. Users are responsible for complying with the laws that apply to them. The on-chain addresses of the program and of each supported token are published on the X1 Privacy website.</p>
+
+</body></html>

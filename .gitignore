@@ -1,0 +1,69 @@
+# This repository is an ALLOW-LIST: everything is ignored unless it is
+# explicitly re-included below. Keys, deployment state, build output and local
+# working files therefore never reach git by accident.
+*
+!*/
+
+# --- top level
+!/.gitignore
+!/README.md
+!/SECURITY.md
+
+# --- documentation
+!/docs/*.md
+!/docs/whitepaper.html
+!/docs/make_whitepaper.py
+
+# --- on-chain program
+!/program/Anchor.toml
+!/program/Cargo.toml
+!/program/Cargo.lock
+!/program/package.json
+!/program/yarn.lock
+!/program/tsconfig.json
+!/program/programs/**
+!/program/client/x1c.ts
+!/program/client/x1c_swap.ts
+!/program/tests/*.ts
+!/program/scripts/*
+!/program/target/idl/x1_confidential.json
+!/program/target/types/x1_confidential.ts
+
+# --- proof module (Rust -> wasm + native CLI)
+!/proofgen/Cargo.toml
+!/proofgen/Cargo.lock
+!/proofgen/.cargo/config.toml
+!/proofgen/src/**
+!/proofgen/tests/**
+
+# --- web client
+!/ui/package.json
+!/ui/package-lock.json
+!/ui/build.js
+!/ui/build-vercel.sh
+!/ui/server.js
+!/ui/public/index.html
+!/ui/public/app.js
+!/ui/public/proofgen51.wasm
+!/ui/public/whitepaper.pdf
+!/ui/vercel/package.json
+!/ui/vercel/api/*.cjs
+!/ui/e2e/live_e2e.py
+
+# --- never, whatever the rules above say
+**/*keypair*
+**/*.key
+**/*.pem
+**/.env*
+**/node_modules/
+**/target/deploy/
+**/target/debug/
+**/target/release/
+/program/client/**/*.json
+/ui/e2e/*.json
+/ui/vercel-dist/
+/ui/vercel/state.json
+/internal/
+/deps/
+/source/
+*.log

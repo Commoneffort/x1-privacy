@@ -1,0 +1,24 @@
+[package]
+name = "x1_confidential"
+version = "0.1.0"
+description = "Created with Anchor"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "x1_confidential"
+
+[features]
+default = []
+cpi = ["no-entrypoint"]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
+# Confidential swaps are experimental and NOT safe for real value: the program
+# cannot bind the plaintext amount of either leg. Off by default.
+experimental-swaps = []
+
+[dependencies]
+anchor-lang = "0.30.1"
+anchor-spl = "0.30.1"

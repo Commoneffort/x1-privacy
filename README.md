@@ -140,6 +140,10 @@ Please report vulnerabilities privately — see [SECURITY.md](SECURITY.md).
 The program is upgradeable and has not been independently audited; the current
 review and its open findings are in [docs/AUDIT-2026-10-02.md](docs/AUDIT-2026-10-02.md).
 
+## License
+
+See [LICENSE](LICENSE).
+
 ## Disclaimer
 
 Experimental software, provided as is, without warranties of any kind. Nothing

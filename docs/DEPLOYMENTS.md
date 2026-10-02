@@ -10,6 +10,7 @@ All addresses below are public on-chain accounts.
 | Token program of the confidential mints | `TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb` (the chain's Token-2022) |
 | ZK ElGamal proof program | `ZkE1Gama1Proof11111111111111111111111111111` (native) |
 | Record program (proof staging; `spl-record` 0.3.0 built from source) | `Gwi2C6TfDHR8kG6YJphktj3VtNxbQFcRddNjcbrDmg8C` |
+| On-chain IDL account (Anchor) | `5mF2ACzc1DGPF3oJWx4FLucMFuzWfLPM7n6XQNJ1hThz` |
 | Fee recipient (owner of the fee token accounts) | `GACCq8Yd4szdB7mCcaViFNwDEej4crZe43YoSPCzmb8M` |
 
 | Token | Backing | Confidential mint | Config | Reserve |

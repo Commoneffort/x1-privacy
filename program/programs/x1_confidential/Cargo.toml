@@ -22,3 +22,4 @@ experimental-swaps = []
 [dependencies]
 anchor-lang = "0.30.1"
 anchor-spl = "0.30.1"
+solana-security-txt = "1.1.1"

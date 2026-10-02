@@ -7,6 +7,18 @@ use anchor_lang::solana_program::{
 
 declare_id!("X1PRVwe2PgSYyWZH2hBtUqAxnpPtp6s14jAgZCu4iF1");
 
+// Contact and source information embedded in the binary (shown by explorers).
+#[cfg(not(feature = "no-entrypoint"))]
+solana_security_txt::security_txt! {
+    name: "X1 Privacy",
+    project_url: "https://x1privacy.vercel.app",
+    contacts: "link:https://github.com/Commoneffort/x1-privacy/security/advisories/new",
+    policy: "https://github.com/Commoneffort/x1-privacy/blob/main/SECURITY.md",
+    preferred_languages: "en",
+    source_code: "https://github.com/Commoneffort/x1-privacy",
+    auditors: "No independent audit yet. Internal review: docs/AUDIT-2026-10-02.md"
+}
+
 // ---------------------------------------------------------------------------
 // X1 Confidential — production-grade confidential layer.
 //

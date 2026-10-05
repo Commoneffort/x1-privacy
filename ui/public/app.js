@@ -241,7 +241,7 @@ async function loadDeployment(){
     const rpcUrl=new URL(String(j.rpc));
     if(rpcUrl.protocol!=="https:")throw new Error("deployment RPC must be https");
     NETWORK=j.network; RPC=rpcUrl.origin;
-    conn=new Connection(RPC,"confirmed"); rpc=createSolanaRpc(RPC);
+    conn=failOnTxError(new Connection(RPC,"confirmed")); rpc=createSolanaRpc(RPC);
     PROGRAM_ID=new PublicKey(j.program);
     CONF_TOKEN=new PublicKey(j.confTokenProgram);
     RECORD_PROGRAM=new PublicKey(j.recordProgram);
@@ -271,6 +271,25 @@ async function loadDeployment(){
     console.error("[conf] loadDeployment FAILED:", e && e.message);
     return false;
   }
+}
+// confirmTransaction resolves normally for a transaction that landed but FAILED
+// on-chain (the failure is only in value.err). Every flow here must stop in
+// that case, so the connection throws instead of reporting it as confirmed.
+function txErrorText(err){
+  try{
+    const ie=err&&err.InstructionError;
+    if(Array.isArray(ie)&&ie[1]&&typeof ie[1].Custom==="number")return "custom program error: 0x"+ie[1].Custom.toString(16);
+    return typeof err==="string"?err:JSON.stringify(err);
+  }catch(_e){ return "unknown error"; }
+}
+function failOnTxError(c){
+  const confirm=c.confirmTransaction.bind(c);
+  c.confirmTransaction=async(...args)=>{
+    const r=await confirm(...args);
+    if(r&&r.value&&r.value.err)throw new Error("The transaction failed on-chain: "+txErrorText(r.value.err));
+    return r;
+  };
+  return c;
 }
 const ZK_PROGRAM = new PublicKey("ZkE1Gama1Proof11111111111111111111111111111");
 let RECORD_PROGRAM = null; // SPL record program used to stage proofs
@@ -312,6 +331,15 @@ function b58enc(bytes){const digs=[];let z=0;while(z<bytes.length&&bytes[z]===0)
 function b58dec(s){const bytes=[0];for(let i=0;i<s.length;i++){const c=B58A.indexOf(s[i]);if(c<0)throw new Error("bad b58");let carry=c;for(let j=0;j<bytes.length;j++){const x=bytes[j]*58+carry;bytes[j]=x&0xff;carry=x>>8;}while(carry){bytes.push(carry&0xff);carry>>=8;}}let l=0;while(s[l]==="1")l++;const out=new Uint8Array(bytes.length+l);for(let i=0;i<l;i++)out[i]=0;for(let i=0;i<bytes.length;i++)out[l+bytes.length-1-i]=bytes[i];return out;}
 function b64enc(b){let s="";for(let i=0;i<b.length;i+=3){s+=String.fromCharCode(b[i],b[i+1],b[i+2]);}return btoa(s).slice(0,Math.ceil(b.length/3)*4);}
 function b64dec(s){const bin=atob(s);const o=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)o[i]=bin.charCodeAt(i);return o;}
+// The 64 signature bytes of a stored derivation signature. b64enc pads a
+// 64-byte input with two zero bytes, so the stored text decodes to 66 bytes;
+// only the signature itself may be copied into the proof module's 64-byte buffer.
+function sigBytes(sigB64){
+  let b=b64dec(sigB64);
+  if(b.length===66&&b[64]===0&&b[65]===0)b=b.subarray(0,64);
+  if(b.length!==64)throw new Error("sig must be 64B");
+  return b;
+}
 function hexenc(b){return Array.from(b).map(x=>x.toString(16).padStart(2,"0")).join("");}
 function hexdec(s){const o=new Uint8Array(s.length/2);for(let i=0;i<o.length;i++)o[i]=parseInt(s.substr(i*2,2),16);return o;}
 function concat(...arrs){const t=arrs.reduce((n,a)=>n+a.length,0);const o=new Uint8Array(t);let p=0;for(const a of arrs){o.set(a,p);p+=a.length;}return o;}
@@ -362,7 +390,7 @@ function pgAlloc(n){return pg().exports.alloc(n);}
 function pgFree(p,n){pg().exports.dealloc(p,n);}
 function pgMem(){return pg().memory();}
 function elgamalSecretFromSig(sigB64){
-  const {exports}=pg();const sig=b64dec(sigB64);
+  const {exports}=pg();const sig=sigBytes(sigB64);
   const sp=exports.alloc(64);pgMem().set(sig,sp);
   const out=exports.alloc(32);
   const len=exports.elgamal_secret_from_signature(sp,64,out,32);
@@ -372,7 +400,7 @@ function elgamalSecretFromSig(sigB64){
   return bytes;
 }
 function aeKeyFromSig(sigB64){
-  const {exports}=pg();const sig=b64dec(sigB64);
+  const {exports}=pg();const sig=sigBytes(sigB64);
   const sp=exports.alloc(64);pgMem().set(sig,sp);
   const out=exports.alloc(16);
   const len=exports.ae_key_from_signature(sp,64,out,16);
@@ -483,7 +511,7 @@ function pubkeyProofFromSecret(secret){
 }
 function genTransferProofFromSig(sigB64,availHex,decHex,amount,destPubHex){
   const {exports}=pg();
-  const sig=b64dec(sigB64);const avail=hexdec(availHex);const dec=hexdec(decHex);
+  const sig=sigBytes(sigB64);const avail=hexdec(availHex);const dec=hexdec(decHex);
   const amt=new TextEncoder().encode(amount.toString());const dest=hexdec(destPubHex);
   const sp=exports.alloc(64);pgMem().set(sig,sp);
   const avp=exports.alloc(64);pgMem().set(avail,avp);
@@ -500,7 +528,7 @@ function genTransferProofFromSig(sigB64,availHex,decHex,amount,destPubHex){
 }
 function genWithdrawProofFromSig(sigB64,availHex,current,amount){
   const {exports}=pg();
-  const sig=b64dec(sigB64);const avail=hexdec(availHex);
+  const sig=sigBytes(sigB64);const avail=hexdec(availHex);
   const cur=new TextEncoder().encode(current.toString());const amt=new TextEncoder().encode(amount.toString());
   const sp=exports.alloc(64);pgMem().set(sig,sp);
   const avp=exports.alloc(64);pgMem().set(avail,avp);
@@ -585,7 +613,15 @@ function walletSignMsg(msg){return _queueSign(()=>walletSignMessage(msg));}
 function normSig(sig){
   if(sig&&typeof sig==="object"&&!(sig instanceof Uint8Array)&&!Array.isArray(sig)&&sig.signature!=null)sig=sig.signature;
   let u;
-  if(typeof sig==="string"){const s=sig.trim();if(/^[A-Za-z0-9+/]+={0,2}$/.test(s)&&s.length%4===0)u=b64dec(s);else if(/^[0-9a-fA-F]+$/.test(s)&&s.length===128)u=hexdec(s);else if(s.length>=80&&s.length<=100)u=b58dec(s);else throw new Error("bad sig enc");}
+  if(typeof sig==="string"){
+    // Hex and base58 text also look like base64, so a decoding only counts if it
+    // yields the 64 bytes of a signature: hex first, then base64, then base58.
+    const s=sig.trim();
+    if(/^[0-9a-fA-F]{128}$/.test(s))u=hexdec(s);
+    if(!u&&/^[A-Za-z0-9+/]+={0,2}$/.test(s)&&s.length%4===0){ try{ const d=b64dec(s); if(d.length===64)u=d; }catch(_e){} }
+    if(!u&&s.length>=80&&s.length<=100){ try{ const d=b58dec(s); if(d.length===64)u=d; }catch(_e){} }
+    if(!u)throw new Error("bad sig enc");
+  }
   else if(sig instanceof Uint8Array)u=sig;
   else if(Array.isArray(sig))u=new Uint8Array(sig);
   else throw new Error("bad sig shape");

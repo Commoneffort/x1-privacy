@@ -4,9 +4,10 @@
 
 [Website](https://x1privacy.xyz) · [Statistics](https://x1privacy.xyz/stats.html) · [Whitepaper (PDF)](ui/public/whitepaper.pdf) · [Integration guide](docs/INTEGRATION.md) · [Deployments](docs/DEPLOYMENTS.md) · [Security](SECURITY.md)
 
-> **Status:** live on X1 mainnet. New software, **not yet independently audited** —
-> see the [internal security review](docs/AUDIT-2026-10-02.md) and its open
-> findings. Only use amounts you can afford to lose.
+> **Status:** live on X1 mainnet. New software. It has had an internal security
+> review and **one independent security review** (October 2026) — see
+> [the reviews and their open findings](docs/AUDIT-2026-10-02.md). Further
+> independent audits are planned. Only use amounts you can afford to lose.
 
 ---
 
@@ -132,15 +133,16 @@ operations. Balances are 64-bit, and unwrapping has no per-operation limit.
 
 - More tokens, each with its own verifiable reserve
 - Confidential swaps (designed as a dedicated mechanism; not shipped until safe)
-- Independent security audits, published in full
+- Further independent security audits, published in full
 - Reduced governance: upgrade authority under shared control
 - Native wallet integration
 
 ## Security
 
 Please report vulnerabilities privately — see [SECURITY.md](SECURITY.md).
-The program is upgradeable and has not been independently audited; the current
-review and its open findings are in [docs/AUDIT-2026-10-02.md](docs/AUDIT-2026-10-02.md).
+The program is upgradeable. One independent security review has been completed
+(October 2026) in addition to the internal one; both, with the findings that
+remain open, are in [docs/AUDIT-2026-10-02.md](docs/AUDIT-2026-10-02.md).
 
 ## License
 

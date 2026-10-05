@@ -7,7 +7,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, "whitepaper.html")
 OUT = os.path.join(HERE, "..", "ui", "public", "whitepaper.pdf")
 FOOTER = ('<div style="width:100%;font-size:8px;color:#8a9bb4;padding:0 20mm;display:flex;justify-content:space-between;'
-          'font-family:Helvetica,Arial,sans-serif"><span>X1 Privacy — Whitepaper v1.0</span>'
+          'font-family:Helvetica,Arial,sans-serif"><span>X1 Privacy — Whitepaper v1.1</span>'
           '<span><span class="pageNumber"></span> / <span class="totalPages"></span></span></div>')
 
 with sync_playwright() as pw:

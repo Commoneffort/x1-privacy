@@ -31,7 +31,7 @@ code{font-family:"DejaVu Sans Mono","Liberation Mono",Menlo,Consolas,monospace;f
   <div class="mark">X1</div>
   <h1>X1 Privacy</h1>
   <div class="sub">Confidential balances and transfers for XNT and USDC.x on X1 — permissionless, self-custodial and fully backed.</div>
-  <div class="meta">Whitepaper · Version 1.0 · October 2026</div>
+  <div class="meta">Whitepaper · Version 1.1 · October 2026</div>
 </div>
 
 <h2>1. Summary</h2>
@@ -164,7 +164,7 @@ code{font-family:"DejaVu Sans Mono","Liberation Mono",Menlo,Consolas,monospace;f
 <h2>10. Security</h2>
 <p>The program is intentionally small, holds a single kind of state per token, and relies on the chain's own token and proof programs for all cryptography. Its design rules are simple: never trust an account or a program supplied by the caller without deriving or checking it on-chain; verify the effect of every mint, burn and transfer against on-chain balances; and keep the exit path free of anything that is not strictly necessary.</p>
 <p>The code has been through internal review and adversarial testing, including end-to-end tests of every user flow against a live network and simulated attempts to bypass the burn, redirect payouts and misuse governance functions.</p>
-<div class="box warn"><b>Independent audits.</b> At the time of this version the protocol has not yet been audited by an independent firm. Independent security audits will be commissioned and added as the protocol grows, and their reports will be published in full. Until then, users should treat the software as new and size their exposure accordingly.</div>
+<div class="box warn"><b>Independent review.</b> In October 2026 an independent security reviewer examined the program and the web client. The review reported no issue that would let a third party take funds from a reserve or from a user; the client fixes adopted from it are live. It was a review by one independent party, not a certification, and it did not cover the chain's own token and proof programs. Further independent security audits will be commissioned as the protocol grows, and their reports will be published in full. Users should still treat the software as new and size their exposure accordingly.</div>
 <h3>Risks users should understand</h3>
 <ul>
 <li><b>Smart-contract risk.</b> A defect in the program, or in the token and proof programs it depends on, could put the reserve at risk.</li>
@@ -177,7 +177,7 @@ code{font-family:"DejaVu Sans Mono","Liberation Mono",Menlo,Consolas,monospace;f
 <ul>
 <li><b>More tokens.</b> Additional X1 assets, each with its own verifiable reserve.</li>
 <li><b>Confidential swaps.</b> Exchanging one confidential token for another without revealing amounts. This requires binding both sides of a trade under encryption and is being designed as a dedicated mechanism; it will not ship until it is safe.</li>
-<li><b>Independent security audits</b>, published as they complete, and a public disclosure channel for researchers.</li>
+<li><b>Further independent security audits</b>, published as they complete, and a public disclosure channel for researchers.</li>
 <li><b>Reduced governance.</b> Moving the upgrade authority to shared control and progressively limiting what it can change.</li>
 <li><b>Wallet integration.</b> One-approval wraps, sends and unwraps with automatic receipt of incoming payments are available in the web client, and an open integration guide is published for wallets and apps. Native support inside wallets depends on each wallet team and is being pursued.</li>
 </ul>

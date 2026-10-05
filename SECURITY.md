@@ -26,9 +26,10 @@ extensions, RPC providers.
 
 ## Status
 
-The protocol has **not yet been audited by an independent firm**. The internal
-review is in [`docs/AUDIT-2026-10-02.md`](docs/AUDIT-2026-10-02.md), including
-the issues that remain open. Independent audits will be published here as they
+The protocol has had an internal review and **one independent security review**
+(October 2026). Both are summarised in
+[`docs/AUDIT-2026-10-02.md`](docs/AUDIT-2026-10-02.md), including the issues
+that remain open. Further independent audits will be published here as they
 complete.
 
 ## Verifying what is deployed

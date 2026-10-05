@@ -212,5 +212,6 @@ account creation, 40k for applying a pending balance, 60k for staging.
   public; balances and transfer amounts are hidden.
 - Do not hard-code the fee or token list; read them from the program and state.
 
-The protocol has not yet been independently audited. Audit reports will be
-published as they complete.
+The protocol has had one independent security review (October 2026); see
+`docs/AUDIT-2026-10-02.md`. Further audit reports will be published as they
+complete.
